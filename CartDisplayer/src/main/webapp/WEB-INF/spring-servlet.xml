@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>                                         
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:context="http://www.springframework.org/schema/context"
+xmlns:p="http://www.springframework.org/schema/p"
+xmlns:tx="http://www.springframework.org/schema/tx"
+xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx.xsd
+">
+
+<tx:annotation-driven />
+
+
+<!-- Step 7 Configure the bean of internal view resolver -->
+
+<context:component-scan base-package="cartdisplayer" />     
+<!-- This is step 7(b) of view resolver which helps to create the name of path at the run time -->
+
+
+<bean name="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+<property name="prefix" value="/WEB-INF/views/" />
+<property  name="suffix" value=".jsp" />
+</bean>
+
+
+<!-- Step 8 Configure the bean : connection with database -->
+
+<!-- Step 8 (a) Configure  database -DriverManagerDateSource -->
+
+<bean name="ds" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+<property name="driverClassName" value="com.mysql.cj.jdbc.Driver"  />
+<property name="url" value="jdbc:mysql://localhost:3306/shivampractice" />
+<property name="username" value="root" />
+<property name="password" value="root" />
+</bean>
+
+<!-- Step 8 (b) Configure  database LocalSessionFactoryBean -->
+
+<bean name="factory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean" >
+
+<property name="dataSource" ref="ds" />
+<property name="hibernateProperties" >
+  <props>
+      <prop key="hibernate.dialect">org.hibernate.dialect.MySQL57Dialect</prop>
+      <prop key="hibernate.show_sql">true</prop>
+      <prop key="hibernate.hbm2ddl.auto">update</prop>     
+  </props>
+</property>
+
+<property name="annotatedClasses">
+<list>
+  
+   <value>cartdisplayer.model.Product</value>
+  <!--  comment this value initially otherwise error will come
+-->
+</list>
+</property>
+
+
+</bean>
+
+<!-- Step 8 (c) Configure  database HibernateTemplate  -->
+
+<bean name="hibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate" >
+<property name="sessionFactory" ref="factory" />
+</bean>
+
+<!-- Step 9  Configure  database HibernateTransactionManager  also enable tx annotaion-driver at top Needed for writing operation in DataBasee-->
+<bean name="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager" >
+<property  name="sessionFactory" ref="factory"/>
+</bean>
+
+
+
+
+
+
+</beans>
